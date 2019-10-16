@@ -1,0 +1,19 @@
+{
+  "name": "@getholo/stream",
+  "version": "0.0.0",
+  "main": "link.js",
+  "license": "MIT",
+  "bin": {
+    "stream": "link.js"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/mri": "^1.1.0"
+  },
+  "dependencies": {
+    "@getholo/stream-server": "^0.1.0",
+    "mri": "^1.1.4"
+  }
+}
