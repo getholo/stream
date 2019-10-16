@@ -1,6 +1,6 @@
 {
   "name": "@getholo/stream",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "link.js",
   "license": "MIT",
   "bin": {
@@ -15,5 +15,6 @@
   "dependencies": {
     "@getholo/stream-server": "^0.1.0",
     "mri": "^1.1.4"
-  }
+  },
+  "gitHead": "b7071db5cbcbf089b7d9643d3d84f71af7063332"
 }

@@ -1,6 +1,6 @@
 {
   "name": "@getholo/stream-server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Holo's Project Stream",
   "main": "dist/server.js",
   "scripts": {
@@ -23,5 +23,6 @@
     "node-fetch": "^2.6.0",
     "upath": "^1.2.0",
     "xml-js": "^1.6.11"
-  }
+  },
+  "gitHead": "b7071db5cbcbf089b7d9643d3d84f71af7063332"
 }
