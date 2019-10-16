@@ -53,7 +53,7 @@ const folderType = 'application/vnd.google-apps.folder';
 interface DriveFile {
   id: string
   name: string
-  mimeType: typeof folderType | 'video/x-matroska'
+  mimeType: keyof typeof extensions | typeof folderType
   md5Checksum?: string
   parents: string[]
   size: string
@@ -67,7 +67,7 @@ interface DriveFiles {
 interface DriveFileWithParent {
   id: string
   name: string
-  mimeType: typeof folderType | 'video/x-matroska'
+  mimeType: keyof typeof extensions | typeof folderType
   md5Checksum?: string
   parent: string
   size: string
@@ -90,7 +90,7 @@ export async function firstFetch(driveId: string, email: string, key: string) {
         includeItemsFromAllDrives: true,
         supportsAllDrives: true,
         fields: 'files/md5Checksum,files/id,files/mimeType,files/parents,files/name,files/size,nextPageToken',
-        q: "trashed = false and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'video/x-matroska')",
+        q: "trashed = false and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'video/x-matroska' or mimeType = 'video/mp4')",
       },
       headers: {
         Authorization: `Bearer ${token}`,
