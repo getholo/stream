@@ -7,7 +7,7 @@ export const propfind = (paths: string[]) => (ctx: RouterContext) => {
   const { request, response } = ctx;
 
   if (request.method === 'PROPFIND') {
-    const folders = createXML(paths.map((path) => createFolder(path)));
+    const folders = createXML(paths.map((path) => createFolder({ path })));
 
     response.type = 'text/xml';
     response.body = folders;

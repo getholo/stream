@@ -35,7 +35,7 @@ export async function startServer(driveId: string, email: string, key: string) {
   // Authentication
 
   app.use(analytics);
-  app.use(auth);
+  app.use(auth('welcome to the alpha weekend', 'alpha-one@getholo.dev'));
 
   // PROPFIND Routes for WEBDAV
 
@@ -53,16 +53,18 @@ export async function startServer(driveId: string, email: string, key: string) {
     if (resolution === '1080' || resolution === '2160' || resolution === 'best') {
       const filteredFilms = Object.entries(films).reduce(
         (list, [film, versions]) => {
-          const version = resolution === 'best'
-            ? versions[2160] || versions[1080]
-            : versions[resolution];
+          const { film: version } = getResolution(resolution, versions);
 
           if (!version) {
             return list;
           }
 
           const ext = extensions[version.mimeType];
-          list.push(createFile(`/best/films/${film}${ext}`, version.size, version.mimeType));
+          list.push(createFile({
+            path: `/best/films/${film}${ext}`,
+            mimeType: version.mimeType,
+            size: version.size,
+          }));
           return list;
         },
         [] as WebDavXML[],
@@ -109,7 +111,13 @@ export async function startServer(driveId: string, email: string, key: string) {
 
     if (request.method === 'PROPFIND') {
       const ext = extensions[version.mimeType];
-      const xml = createXML([createFile(`/best/films/${filmId}${ext}`, version.size, version.mimeType)]);
+      const xml = createXML([
+        createFile({
+          path: `/best/films/${filmId}${ext}`,
+          size: version.size,
+          mimeType: version.mimeType,
+        }),
+      ]);
 
       response.type = 'text/xml';
       response.body = xml;

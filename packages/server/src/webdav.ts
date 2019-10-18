@@ -1,5 +1,6 @@
 import { js2xml } from 'xml-js';
 import { basename } from 'path';
+import { extensions } from './content';
 
 export interface WebDavXML {
   href: string
@@ -18,7 +19,11 @@ export interface WebDavXML {
   }
 }
 
-export function createFolder(path: string): WebDavXML {
+interface createFolderParams {
+  path: string
+}
+
+export function createFolder({ path }: createFolderParams): WebDavXML {
   return {
     href: path,
     propstat: {
@@ -33,7 +38,13 @@ export function createFolder(path: string): WebDavXML {
   };
 }
 
-export function createFile(path: string, size: number, mimeType: string): WebDavXML {
+interface CreateFileParams {
+  path: string
+  size: number
+  mimeType: keyof typeof extensions
+}
+
+export function createFile({ mimeType, path, size }: CreateFileParams): WebDavXML {
   return {
     href: path,
     propstat: {
