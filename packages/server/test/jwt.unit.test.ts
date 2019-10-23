@@ -19,24 +19,31 @@ interface Payload {
   exp: number
 }
 
+let key: string;
+
+beforeAll(async () => {
+  const { privateKey } = await generateKeyPair('rsa', {
+    modulusLength: 4096,
+    publicKeyEncoding: {
+      type: 'spki',
+      format: 'pem',
+    },
+    privateKeyEncoding: {
+      type: 'pkcs8',
+      format: 'pem',
+    },
+  });
+
+  key = privateKey;
+});
+
 describe('JSON Web Token', () => {
   describe('Creating a JWT', () => {
     // https://auth0.com/docs/tokens/guides/jwt/validate-jwt#check-that-the-jwt-is-well-formed
-    it('JWT Signature is valid', async () => {
+    it('JWT Signature is valid', () => {
       const email = 'test@getholo.dev';
-      const { privateKey } = await generateKeyPair('rsa', {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-          type: 'spki',
-          format: 'pem',
-        },
-        privateKeyEncoding: {
-          type: 'pkcs8',
-          format: 'pem',
-        },
-      });
 
-      const jwt = createJWT(email, privateKey);
+      const jwt = createJWT(email, key);
       const segments = jwt.split('.');
       const [header, payload, signature] = segments;
 
