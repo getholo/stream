@@ -8,7 +8,7 @@ interface Params extends DriveParams {
   realm: string
 }
 
-export async function startServer(params: Params) {
+export async function createServer(params: Params) {
   const content = new Content(params);
   await content.firstFetch();
 
@@ -32,13 +32,5 @@ export async function startServer(params: Params) {
   });
   app.use((ctx) => routing.middleware(ctx));
 
-  await new Promise(
-    (resolve) => {
-      app.listen(4000, () => {
-        resolve();
-      });
-    },
-  );
-
-  console.log('Project Stream tuning in on port 4000');
+  return app;
 }
