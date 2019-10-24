@@ -1,10 +1,10 @@
-import { RouterContext } from '@koa/router';
+import { ParameterizedContext } from 'koa';
 import { createHash } from 'crypto';
 import nanoid from 'nanoid';
 
 type Next = () => Promise<any>
 
-const md5 = (value: string) => createHash('md5').update(value).digest('hex');
+export const md5 = (value: string) => createHash('md5').update(value).digest('hex');
 
 interface Digest {
   username: string
@@ -17,14 +17,60 @@ interface Digest {
   uri: string
 }
 
-export type AuthContext = RouterContext<{ user: string }>
+interface DigestAuthParams {
+  header: string
+  method: string
+  realm: string
+  password: string
+}
 
-export async function auth(ctx: AuthContext, next: Next) {
-  const { request, response } = ctx;
+export function digestAuth(params: DigestAuthParams) {
+  const creds = params.header.replace('Digest', '').split(',').reduce(
+    (obj, cred) => {
+      const [name, value] = cred.split('=');
+      return {
+        ...obj,
+        [name.trim()]: value.replace(/"/g, '').trim(),
+      };
+    },
+    {} as Digest,
+  );
+
+  const hash1 = md5(`${creds.username}:${params.realm}:${params.password}`);
+  const hash2 = md5(`${params.method}:${creds.uri}`);
+
+  const digesthash = creds.qop === 'auth'
+    ? md5([hash1, creds.nonce, creds.nc, creds.cnonce, creds.qop, hash2].join(':'))
+    : md5([hash1, creds.nonce, hash2].join(':'));
+
+  if (digesthash === creds.response) {
+    return creds.username;
+  }
+
+  return undefined;
+}
+
+interface BasicAuthParams {
+  header: string
+  password: string
+}
+
+export function basicAuth(params: BasicAuthParams) {
+  const creds = Buffer.from(params.header.replace('Basic', '').trim(), 'base64').toString('ascii');
+  const [username, pass] = creds.split(':');
+
+  if (pass === params.password) {
+    return username;
+  }
+
+  return undefined;
+}
+
+export type AuthContext = ParameterizedContext<{ user: string }>
+
+export const auth = (password: string, realm: string) => async (ctx: AuthContext, next: Next) => {
+  const { request, response, method } = ctx;
   const header = request.get('authorization');
-
-  const password = 'welcome to the alpha weekend';
-  const realm = 'alpha-one@getholo.dev';
 
   if (!header) {
     response.set('WWW-Authenticate', `Digest realm="${realm}", nonce="${nanoid(24)}", algorithm="MD5"`);
@@ -36,46 +82,40 @@ export async function auth(ctx: AuthContext, next: Next) {
   const isBasic = header.startsWith('Basic');
 
   if (isDigest) {
-    const creds = header.replace('Digest', '').split(',').reduce(
-      (obj, cred) => {
-        const [name, value] = cred.split('=');
-        return {
-          ...obj,
-          [name.trim()]: value.replace(/"/g, '').trim(),
-        };
-      },
-      {} as Digest,
-    );
-
-    const hash = md5(`${creds.username}:${realm}:${password}`);
-    const hash2 = md5(`${request.method}:${creds.uri}`);
-
-    const digesthash = creds.qop === 'auth'
-      ? md5([hash, creds.nonce, creds.nc, creds.cnonce, creds.qop, hash2].join(':'))
-      : md5([hash, creds.nonce, hash2].join(':'));
-
-    if (creds.response === digesthash) {
-      ctx.state.user = creds.username;
-      await next();
-      return;
-    }
-  }
-
-  if (isBasic) {
     try {
-      const creds = Buffer.from(header.replace('Basic', '').trim(), 'base64').toString('ascii');
-      const [username, pass] = creds.split(':');
-
-      if (pass === password) {
+      const username = digestAuth({
+        header,
+        method,
+        password,
+        realm,
+      });
+      if (username) {
         ctx.state.user = username;
         await next();
         return;
       }
     } catch {
-      // fall back to Digest auth
+      // Incorrect header given, resolve to 401
+    }
+  }
+
+  if (isBasic) {
+    try {
+      const username = basicAuth({
+        header,
+        password,
+      });
+
+      if (username) {
+        ctx.state.user = username;
+        await next();
+        return;
+      }
+    } catch {
+      // Set Header down below
     }
   }
 
   response.set('WWW-Authenticate', `Digest realm="${realm}", nonce="${nanoid(24)}", algorithm="MD5"`);
   response.status = 401;
-}
+};

@@ -1,0 +1,14 @@
+name: Unit Testing
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Build & Test
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: yarn install
+      - run: yarn test

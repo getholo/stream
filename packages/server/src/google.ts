@@ -1,5 +1,4 @@
 import axios from 'axios';
-import fetch from 'node-fetch';
 
 import { createJWT } from './jwt';
 
@@ -43,7 +42,9 @@ export async function getAccessToken(email: string, key: string, force = false) 
 }
 
 export async function getStream(id: string, start: number, end: number, token: string) {
-  const { body, status } = await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`, {
+  const { data } = await axios.request<NodeJS.ReadableStream>({
+    url: `https://www.googleapis.com/drive/v3/files/${id}?alt=media`,
+    responseType: 'stream',
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -51,8 +52,5 @@ export async function getStream(id: string, start: number, end: number, token: s
     },
   });
 
-  return {
-    status,
-    stream: body,
-  };
+  return data;
 }
