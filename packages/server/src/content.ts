@@ -85,9 +85,9 @@ export class Content {
 
   constructor(params: DriveParams) {
     this.config = {
-      filmRegex: '/films/:film/:file',
-      showRegex: '/shows/:show/:season/:episode',
       ...params,
+      filmRegex: params.filmRegex || '/films/:film/:file',
+      showRegex: params.showRegex || '/shows/:show/:season/:episode',
     };
 
     if (params.files) {

@@ -3,6 +3,8 @@ import { Content, DriveParams } from './content';
 import { Routing } from './routes';
 import { auth } from './auth';
 
+export { generateFilmExp, generateShowExp } from './paths';
+
 interface Params extends DriveParams {
   password: string
   realm: string
