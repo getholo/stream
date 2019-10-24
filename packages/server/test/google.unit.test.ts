@@ -1,6 +1,7 @@
 import axios from 'axios';
 import crypto from 'crypto';
 import { promisify } from 'util';
+import { Readable } from 'stream';
 
 import { getAccessToken, getStream } from '../src/google';
 
@@ -66,7 +67,7 @@ describe('Google API', () => {
     it('When requesting a stream, the Drive API should be called with the correct parameters', async () => {
       mockedAxios.request.mockResolvedValueOnce({
         status: 200,
-        data: 'whatever',
+        data: new Readable(),
       });
 
       const id = '123';

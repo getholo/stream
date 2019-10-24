@@ -40,6 +40,7 @@ export async function fetchFiles(driveId: string, email: string, key: string) {
         supportsAllDrives: true,
         fields: 'files/md5Checksum,files/id,files/mimeType,files/parents,files/name,files/size,nextPageToken',
         q: "trashed = false and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'video/x-matroska' or mimeType = 'video/mp4')",
+        pageToken,
       },
       headers: {
         Authorization: `Bearer ${token}`,
