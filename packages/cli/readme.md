@@ -87,11 +87,13 @@ Shared Drive
 2. Install Project Stream by running: `npm install -g @getholo/stream`.
 
 ### Running Project Stream
-Run project stream with: `stream --account <account.json> --driveId <driveId>`.
+Run project stream with: `stream --account <account.json> --driveId <driveId> -p <password>`.
 
 - In the placeholder of `<account.json>` you should fill in the path to the JSON file of the service account you just downloaded.
 - In the placeholder of `<driveId>` you should fill in the ID of your Shared Drive.
 You can find this ID at the end of the URL of your Shared Drive, ONLY when you're viewing it at the root level. (Should end with VA)
+- In the placeholder of `<password>` you should fill in the password you want to use for authentication.
+If the password is not given, it defaults to `alpha.2`.
 
 You should now see the message: `Project Stream tuning in on port 4000`.
 If this is **not** the case, something went wrong during the setup, and you should revisit the steps highlighted above.
@@ -114,7 +116,7 @@ Though in theory any client supporting the WebDAV standard should be compatible.
 - **Remote path:** *you can leave this empty*
 - **Port:** 4000
 - **Username:** *can be anything really, just not blank*
-- **Password:** `welcome to the alpha weekend` *subject to change*
+- **Password:** `alpha.2` *or the password you set with the -p param*
 
 7. Now select the share as `dav://localhost:4000`
 8. Pick the resolution you would like to add
@@ -135,7 +137,7 @@ Though in theory any client supporting the WebDAV standard should be compatible.
 - **Protocol:** WebDAV *HTTPS when using Caddy*
 - **Address:** Local IP of the machine running the Stream server, or subdomain when using Caddy.
 - **Username:** *can be anything really, just not blank*
-- **Password:** `welcome to the alpha weekend` *subject to change*
+- **Password:** `alpha.2` *or the password you set with the -p param*
 
 *Note: When not using Caddy, fill in port 4000 in the Advanced options*
 
