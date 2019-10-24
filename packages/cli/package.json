@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@getholo/stream-server": "^1.0.0-alpha.3",
+    "kleur": "^3.0.3",
     "mri": "^1.1.4"
   },
   "gitHead": "b7071db5cbcbf089b7d9643d3d84f71af7063332"

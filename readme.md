@@ -37,12 +37,10 @@ Currently known limitations:
 
 - No support for TV Shows.
 - Only 1080p and 2160p content is currently supported.
-- Shared Drives much follow a strict file hierarchy.
 - No transcoded streams through the use of STRM.
 - No multi-user support.
 - No analytics platform.
 - Only supports shared drives.
-- No MP4 container support yet.
 
 ## Getting started
 
@@ -52,8 +50,30 @@ Currently known limitations:
 3. With the API enabled, now visit the IAM & admin page, and select the Service Accounts tab.
 Here you should create a new service account, take note of the email address, and download the key as a JSON file.
 
-### Setting up the Shared Drive
-*Note: Holo's Project Stream requires a new Shared Drive to be made, and is not compatible with existing Shared Drives.*
+### Using an existing Shared Drive
+*Note: there is no visual indicator indicating the progress of the fetching of files. Thus, it is recommended to use Shared Drives with less than 10.000 files for the best results.*
+
+To use your existing media, in whatever format, it is crucial for you to tell Project Stream what your folder structure looks like.
+
+#### Films Pattern
+Default: `/films/:film/:file`
+
+The films pattern requires two parameters: `film` and `file`. Parameters can be identified by the colon `:` in front of the name of the parameter.
+
+1. `:film` is a folder with the title + of the film as its name.
+2. `:file` is the actual file of the film. This should be either a `.mkv` or `.mp4` file and should include the resolution `2160p` or `1080p` in its name.
+3. Additional parameters can be supplied to act as wildcards, but are currently ignored by the code.
+
+Some of the most used patterns include:
+- `/Media/Movies/:film/:file` (CloudBox default)
+- `/Media/Movies/:resolution/:film/:file`
+- `/Media/Movies/:decade/:film/:file`
+- `/Movies/:resolution/:film/:file`
+- `/Movies/:film/:file`
+
+The films pattern can be set by supplying the CLI with the `--filmsPattern <pattern>` flag.
+
+### Setting up a new Shared Drive
 
 1. Create a new Shared Drive within your Google Drive. (Requires a [GSuite](https://gsuite.google.com/pricing.html) account)
 2. Invite the email address of the service account you just made to the Shared Drive. (Read-Only access advised)
