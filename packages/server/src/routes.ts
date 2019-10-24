@@ -86,7 +86,7 @@ export function getChildren(path: string, films: FilmsPerResolution) {
     }
   }
 
-  return [];
+  return undefined;
 }
 
 const buffer = 50 * 1024 * 1024;
@@ -185,7 +185,7 @@ export class Routing {
 
     if (method === 'PROPFIND') {
       const children = getChildren(path, this.films);
-      if (children.length < 1) {
+      if (!children) {
         ctx.status = 404;
         return;
       }
