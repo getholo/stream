@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.4](https://github.com/getholo/stream/compare/@getholo/stream@1.0.0-alpha.3...@getholo/stream@1.0.0-alpha.4) (2019-10-26)
+
+
+### Features
+
+* Add support for custom folder structures ([#5](https://github.com/getholo/stream/issues/5)) ([26905ed](https://github.com/getholo/stream/commit/26905ed8b7ad9f56bf694628d913e4863ef95680))
+* fetch changes in Drive periodically ([#6](https://github.com/getholo/stream/issues/6)) ([a668c15](https://github.com/getholo/stream/commit/a668c152c2151d437355022ce89c6fc8e4cbf83c))
+
+
+
+
+
 # [1.0.0-alpha.3](https://github.com/getholo/stream/compare/@getholo/stream@1.0.0-alpha.2...@getholo/stream@1.0.0-alpha.3) (2019-10-24)
 
 **Note:** Version bump only for package @getholo/stream
