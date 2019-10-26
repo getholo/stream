@@ -60,7 +60,7 @@ Default: `/films/:film/:file`
 
 The films pattern requires two parameters: `film` and `file`. Parameters can be identified by the colon `:` in front of the name of the parameter.
 
-1. `:film` is a folder with the title + of the film as its name.
+1. `:film` is a folder with the title + year of the film as its name.
 2. `:file` is the actual file of the film. This should be either a `.mkv` or `.mp4` file and should include the resolution `2160p` or `1080p` in its name.
 3. Additional parameters can be supplied to act as wildcards, but are currently ignored by the code.
 

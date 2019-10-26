@@ -7,7 +7,8 @@
     "stream": "link.js"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "devDependencies": {
     "@types/mri": "^1.1.0"

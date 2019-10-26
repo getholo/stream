@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "build": "lerna run build",
+    "watch": "lerna run watch",
     "test": "lerna run test"
   },
   "devDependencies": {
@@ -13,7 +14,6 @@
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
-    "@zeit/ncc": "^0.20.5",
     "eslint": "^6.5.1",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",

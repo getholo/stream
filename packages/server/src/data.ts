@@ -48,7 +48,6 @@ export class Files {
     let parents = parentIds;
 
     while (parents.length > 0) {
-      // console.log('iteration!');
       parents = this.findChildren(...parents);
       descendants.push(...parents);
     }
