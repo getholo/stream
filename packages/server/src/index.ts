@@ -34,5 +34,15 @@ export async function createServer(params: Params) {
   });
   app.use((ctx) => routing.middleware(ctx));
 
+  setInterval(
+    async () => {
+      await content.fetchChanges();
+      const newContent = content.createData();
+
+      routing.setFilms(newContent.films);
+    },
+    60 * 1000,
+  );
+
   return app;
 }

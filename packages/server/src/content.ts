@@ -16,6 +16,7 @@ export interface DriveFile {
   md5Checksum?: string
   parents: string[]
   size?: string
+  trashed?: boolean
 }
 
 interface DriveFiles {
@@ -23,17 +24,23 @@ interface DriveFiles {
   nextPageToken?: string
 }
 
-export async function fetchFiles(driveId: string, email: string, key: string) {
+interface FetchFilesProps {
+  driveId: string
+  email: string
+  key: string
+}
+
+export async function fetchFiles(props: FetchFilesProps) {
   const files: DriveFile[] = [];
   let pageToken: string = null;
 
   while (pageToken !== undefined) {
-    const token = await getAccessToken(email, key);
+    const token = await getAccessToken(props.email, props.key);
     const { data } = await axios.request<DriveFiles>({
       method: 'GET',
       url: 'https://www.googleapis.com/drive/v3/files',
       params: {
-        driveId,
+        driveId: props.driveId,
         corpora: 'drive',
         pageSize: 1000,
         includeItemsFromAllDrives: true,
@@ -54,13 +61,83 @@ export async function fetchFiles(driveId: string, email: string, key: string) {
   return files;
 }
 
+interface ChangeToken {
+  startPageToken: string
+}
+
+export async function fetchStartChangeToken(props: FetchFilesProps) {
+  const token = await getAccessToken(props.email, props.key);
+  const { data } = await axios.request<ChangeToken>({
+    method: 'GET',
+    url: 'https://www.googleapis.com/drive/v3/changes/startPageToken',
+    params: {
+      driveId: props.driveId,
+      supportsAllDrives: true,
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return data.startPageToken;
+}
+
+export interface Change {
+  file: DriveFile
+  time: string
+}
+
+interface Changes {
+  nextPageToken: string
+  newStartPageToken: string
+  changes: Change[]
+}
+
+interface FetchChangesProps extends FetchFilesProps {
+  changeToken: string
+}
+
+export async function fetchChanges(props: FetchChangesProps) {
+  const changes: Change[] = [];
+  let pageToken = props.changeToken;
+  let newChangeToken: string;
+
+  while (pageToken !== undefined) {
+    const token = await getAccessToken(props.email, props.key);
+    const { data } = await axios.request<Changes>({
+      method: 'GET',
+      url: 'https://www.googleapis.com/drive/v3/changes',
+      params: {
+        driveId: props.driveId,
+        pageSize: 1000,
+        includeItemsFromAllDrives: true,
+        supportsAllDrives: true,
+        fields: 'changes/file/trashed,changes/file/md5Checksum,changes/file/id,changes/file/mimeType,changes/file/parents,changes/file/name,changes/file/size,changes/time,nextPageToken,newStartPageToken',
+        pageToken,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    changes.push(...data.changes);
+    pageToken = data.nextPageToken;
+    newChangeToken = data.newStartPageToken;
+  }
+
+  return {
+    changes,
+    newChangeToken,
+  };
+}
+
 export interface FilmFile {
   mimeType: keyof typeof extensions
   id: string
   size: number
 }
 
-interface Versions {
+export interface Versions {
   '2160'?: FilmFile
   '1080'?: FilmFile
 }
@@ -83,6 +160,8 @@ export class Content {
 
   private config: DriveParams;
 
+  private changeToken: string;
+
   constructor(params: DriveParams) {
     this.config = {
       ...params,
@@ -100,14 +179,13 @@ export class Content {
   async firstFetch() {
     this.files.clear();
 
-    const { driveId, email, key } = this.config;
-
-    this.files.set(driveId, {
+    this.files.set(this.config.driveId, {
       name: 'Shared Drive',
       parent: null,
     });
 
-    const allFiles = await fetchFiles(driveId, email, key);
+    const allFiles = await fetchFiles(this.config);
+
     for (const file of allFiles) {
       this.files.set(file.id, {
         name: file.name,
@@ -115,6 +193,35 @@ export class Content {
         mimeType: file.mimeType,
         size: parseInt(file.size, 10),
       });
+    }
+
+    this.changeToken = await fetchStartChangeToken(this.config);
+    // fetch StartPageToken
+  }
+
+  async fetchChanges() {
+    const { changeToken } = this;
+
+    const { changes, newChangeToken } = await fetchChanges({
+      ...this.config,
+      changeToken,
+    });
+
+    this.changeToken = newChangeToken;
+
+    for (const change of changes) {
+      const { file } = change;
+
+      if (file.trashed) {
+        this.files.delete(file.id);
+      } else {
+        this.files.set(file.id, {
+          name: file.name,
+          parent: file.parents[0],
+          mimeType: file.mimeType,
+          size: parseInt(file.size, 10),
+        });
+      }
     }
   }
 

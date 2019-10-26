@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { getAccessToken } from '../src/google';
-import { Files } from '../src/data';
+import { getAccessToken } from '../../src/google';
+import { Files } from '../../src/data';
 import {
   fetchFiles,
   Content,
   DriveFile,
   Films,
-} from '../src/content';
+} from '../../src/content';
 
 jest.mock('axios');
-jest.mock('../src/google');
+jest.mock('../../src/google');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const getToken = getAccessToken as jest.Mock;
@@ -19,6 +19,7 @@ getToken.mockReturnValue('token');
 describe('Content', () => {
   describe('Date fetching', () => {
     it('When fetching data from Google Drive, pageTokens should repeat the fetching', async () => {
+      // Files fetch 1
       mockedAxios.request.mockResolvedValueOnce({
         data: {
           files: [{
@@ -28,6 +29,7 @@ describe('Content', () => {
         },
       });
 
+      // Files fetch 2
       mockedAxios.request.mockResolvedValueOnce({
         data: {
           files: [{
@@ -36,7 +38,11 @@ describe('Content', () => {
         },
       });
 
-      const files = await fetchFiles('driveId', 'email', 'key');
+      const files = await fetchFiles({
+        driveId: 'driveId',
+        email: 'email',
+        key: 'key',
+      });
 
       expect(mockedAxios.request).toBeCalledTimes(2);
       expect(getToken).toBeCalledTimes(2);
@@ -88,9 +94,17 @@ describe('Content', () => {
         },
       ];
 
+      // files fetch
       mockedAxios.request.mockResolvedValueOnce({
         data: {
           files,
+        },
+      });
+
+      // ChangeToken fetch
+      mockedAxios.request.mockResolvedValueOnce({
+        data: {
+          startPageToken: 'changeToken',
         },
       });
 

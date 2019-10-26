@@ -40,9 +40,17 @@ const files: DriveFile[] = [
 beforeAll(async () => {
   // mock mock, who's there?
   getToken.mockReturnValueOnce('token');
+  // files
   mockedAxios.request.mockResolvedValueOnce({
     data: {
       files,
+    },
+  });
+
+  // changeToken
+  mockedAxios.request.mockResolvedValueOnce({
+    data: {
+      startPageToken: 'changeToken',
     },
   });
 

@@ -10,7 +10,6 @@
   },
   "devDependencies": {
     "@types/koa": "^2.0.50",
-    "@types/mri": "^1.1.0",
     "@types/node-fetch": "^2.5.2",
     "@types/supertest": "^2.0.8",
     "supertest": "^4.0.2"
