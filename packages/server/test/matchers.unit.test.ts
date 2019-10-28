@@ -4,6 +4,7 @@ import {
   matchFilms,
   matchShows,
   matchFilmFile,
+  getEpisodeDetails,
 } from '../src/matchers';
 
 describe('Route Matchers', () => {
@@ -133,6 +134,29 @@ describe('Route Matchers', () => {
       expect(matchFilmFile('/best/films')).toBeFalsy();
       expect(matchFilmFile('/best/shows/show')).toBeFalsy();
       expect(matchFilmFile('/best/films/film/file')).toBeFalsy();
+    });
+  });
+
+  describe('Episode Details matcher', () => {
+    it('When given file "Watchmen.S01E01.mkv", matcher should return season 1, episode 1', () => {
+      const match = getEpisodeDetails('Watchmen.S01E01.mkv');
+
+      expect(match).toBeTruthy();
+      expect(match.season).toEqual(1);
+      expect(match.episode).toEqual(1);
+    });
+
+    it('When given file "The.Simpsons.S31E04.mkv", matcher should return season 31, episode 4', () => {
+      const match = getEpisodeDetails('The.Simpsons.S31E04.mkv');
+
+      expect(match).toBeTruthy();
+      expect(match.season).toEqual(31);
+      expect(match.episode).toEqual(4);
+    });
+
+    it('When given any other pattern, matcher should return falsy', () => {
+      expect(getEpisodeDetails('The.Simpsons.episode.1.season.2')).toBeFalsy();
+      expect(getEpisodeDetails('The.Simpsons.E02S02')).toBeFalsy();
     });
   });
 });

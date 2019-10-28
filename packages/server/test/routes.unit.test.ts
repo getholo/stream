@@ -1,13 +1,14 @@
 import request from 'supertest';
 import Koa from 'koa';
 
-import { Films, FilmFile } from '../src/content';
+import { Films, File, Shows } from '../src/content';
 import { createFolder, createFile } from '../src/webdav';
 import { getAccessToken, getStream } from '../src/google';
 
 import {
-  filmsPerResolution,
+  toResolution,
   FilmsPerResolution,
+  ShowsPerResolution,
   getChildren,
   parseRange,
   getVideoStream,
@@ -19,13 +20,13 @@ jest.mock('../src/google');
 const getToken = getAccessToken as jest.Mock;
 const fetchStream = getStream as jest.Mock;
 
-const bladeRunner4k: FilmFile = {
+const bladeRunner4k: File = {
   id: '1',
   mimeType: 'video/x-matroska',
   size: 50 * 1024 * 1024 * 1024,
 };
 
-const bladeRunner: FilmFile = {
+const bladeRunner: File = {
   id: '2',
   mimeType: 'video/mp4',
   size: 15 * 1024 * 1024 * 1024,
@@ -43,16 +44,28 @@ const films: FilmsPerResolution = {
   },
 };
 
+const shows: ShowsPerResolution = {
+  best: {
+
+  },
+  2160: {
+
+  },
+  1080: {
+
+  },
+};
+
 describe('Routing logic', () => {
   describe('Films to resolution-sorted films', () => {
     it('When given a Films object, best resolution should be picked', () => {
-      const fileOne: FilmFile = {
+      const fileOne: File = {
         id: '1',
         size: 1000,
         mimeType: 'video/mp4',
       };
 
-      const fileTwo: FilmFile = {
+      const fileTwo: File = {
         id: '2',
         size: 2000,
         mimeType: 'video/x-matroska',
@@ -77,14 +90,15 @@ describe('Routing logic', () => {
         },
       };
 
-      const sortedOnResolution = filmsPerResolution(input);
+      const sortedOnResolution = toResolution(input);
       expect(sortedOnResolution).toEqual(expected);
     });
   });
 
   describe('WebDAV routes', () => {
     it('Path "/" should list best, 2160 and 1080 resolutions', () => {
-      const output = getChildren('/', films);
+      const output = getChildren({ path: '/', films, shows });
+
       expect(output).toEqual([
         createFolder({ path: '/best' }),
         createFolder({ path: '/2160' }),
@@ -92,29 +106,36 @@ describe('Routing logic', () => {
       ]);
     });
 
-    it('Path "/best" should list films directory', () => {
-      const output = getChildren('/best', films);
+    it('Path "/best" should list films and shows directory', () => {
+      const output = getChildren({ path: '/best', films, shows });
+
       expect(output).toEqual([
         createFolder({ path: '/best/films' }),
+        createFolder({ path: '/best/shows' }),
       ]);
     });
 
-    it('Path "/2160" should list films directory', () => {
-      const output = getChildren('/2160', films);
+    it('Path "/2160" should list films and shows directory', () => {
+      const output = getChildren({ path: '/2160', films, shows });
+
       expect(output).toEqual([
         createFolder({ path: '/2160/films' }),
+        createFolder({ path: '/2160/shows' }),
       ]);
     });
 
-    it('Path "/1080" should list films directory', () => {
-      const output = getChildren('/1080', films);
+    it('Path "/1080" should list films and shows directory', () => {
+      const output = getChildren({ path: '/1080', films, shows });
+
       expect(output).toEqual([
         createFolder({ path: '/1080/films' }),
+        createFolder({ path: '/1080/shows' }),
       ]);
     });
 
     it('Path "/best/films" should list 4K variant of blade-runner', () => {
-      const output = getChildren('/best/films', films);
+      const output = getChildren({ path: '/best/films', films, shows });
+
       expect(output).toEqual([
         createFile({
           ...bladeRunner4k,
@@ -124,7 +145,8 @@ describe('Routing logic', () => {
     });
 
     it('Path "/2160/films" should list 4K variant of blade-runner', () => {
-      const output = getChildren('/2160/films', films);
+      const output = getChildren({ path: '/2160/films', films, shows });
+
       expect(output).toEqual([
         createFile({
           ...bladeRunner4k,
@@ -134,7 +156,8 @@ describe('Routing logic', () => {
     });
 
     it('Path "/1080/films" should list HD variant of blade-runner', () => {
-      const output = getChildren('/1080/films', films);
+      const output = getChildren({ path: '/1080/films', films, shows });
+
       expect(output).toEqual([
         createFile({
           ...bladeRunner,
@@ -144,7 +167,8 @@ describe('Routing logic', () => {
     });
 
     it('Path "/best/films/blade-runner.mkv" should list 4K variant of blade-runner', () => {
-      const output = getChildren('/best/films/blade-runner.mkv', films);
+      const output = getChildren({ path: '/best/films/blade-runner.mkv', films, shows });
+
       expect(output).toEqual([
         createFile({
           ...bladeRunner4k,
@@ -154,7 +178,12 @@ describe('Routing logic', () => {
     });
 
     it('Path "/2160/films/blade-runner.mkv" should list 4K variant of blade-runner', () => {
-      const output = getChildren('/2160/films/blade-runner.mkv', films);
+      const output = getChildren({
+        shows: undefined,
+        path: '/2160/films/blade-runner.mkv',
+        films,
+      });
+
       expect(output).toEqual([
         createFile({
           ...bladeRunner4k,
@@ -164,7 +193,8 @@ describe('Routing logic', () => {
     });
 
     it('Path "/1080/films/blade-runner.mp4" should list HD variant of blade-runner', () => {
-      const output = getChildren('/1080/films/blade-runner.mp4', films);
+      const output = getChildren({ path: '/1080/films/blade-runner.mp4', films, shows });
+
       expect(output).toEqual([
         createFile({
           ...bladeRunner,
@@ -174,8 +204,8 @@ describe('Routing logic', () => {
     });
 
     describe('Paths that should throw', () => {
-      it('/720', () => expect(getChildren('/720', films)).toBeUndefined());
-      it('/2160/films/bladerunner', () => expect(getChildren('/2160/films/bladerunner', films)).toBeUndefined());
+      it('/720', () => expect(getChildren({ path: '/720', films, shows })).toBeUndefined());
+      it('/2160/films/bladerunner', () => expect(getChildren({ path: '/2160/films/bladerunner', films, shows })).toBeUndefined());
     });
   });
 
@@ -232,6 +262,7 @@ describe('Routing logic', () => {
         email: 'email',
         key: 'key',
         films,
+        shows,
       });
 
       expect(getToken).not.toHaveBeenCalled();
@@ -246,6 +277,7 @@ describe('Routing logic', () => {
         email: 'email',
         key: 'key',
         films,
+        shows,
       });
 
       expect(getToken).not.toHaveBeenCalled();
@@ -265,6 +297,7 @@ describe('Routing logic', () => {
         email: 'email',
         key: 'key',
         films,
+        shows,
       });
 
       expect(getToken).toHaveBeenCalledTimes(1);
@@ -291,8 +324,23 @@ describe('Routing logic', () => {
       },
     };
 
+    const inputShows: Shows = {
+      watchmen: {
+        2160: {
+          1: {
+            1: {
+              id: '1',
+              mimeType: 'video/x-matroska',
+              size: 500 * 1024 * 1024,
+            },
+          },
+        },
+      },
+    };
+
     const routing = new Routing({
       films: inputFilms,
+      shows: inputShows,
       email: 'email',
       key: 'key',
     });

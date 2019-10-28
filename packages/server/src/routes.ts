@@ -1,7 +1,12 @@
 import { Context } from 'koa';
 import { createXML, createFile, createFolder } from './webdav';
-import { Films, FilmFile, extensions } from './content';
 import { getStream, getAccessToken } from './google';
+import {
+  Films,
+  File,
+  extensions,
+  Shows,
+} from './content';
 
 import {
   matchRoot,
@@ -9,40 +14,67 @@ import {
   matchFilms,
   matchFilmFile,
   Resolution,
+  matchShows,
+  matchSeasonFolder,
+  matchShowFolder,
+  isEpisodeFile,
+  getEpisodeDetails,
 } from './matchers';
 
 export type FilmsPerResolution = {
   [key in Resolution]: {
-    [film: string]: FilmFile
+    [film: string]: File
   }
 }
 
-export function filmsPerResolution(films: Films) {
-  return Object.entries(films).reduce(
-    (obj, [film, versions]) => {
-      const filmsOnResolution = obj;
+export type ShowsPerResolution = {
+  [key in Resolution]: {
+    [show: string]: {
+      [season: number]: {
+        [episode: number]: File
+      }
+    }
+  }
+}
+
+export function toResolution(input: Films): FilmsPerResolution
+export function toResolution(input: Shows): ShowsPerResolution
+export function toResolution(input: Shows | Films) {
+  return Object.entries(input).reduce(
+    (obj, [show, versions]) => {
+      const output = obj;
 
       if (versions['1080']) {
-        filmsOnResolution['1080'][film] = versions['1080'];
-        filmsOnResolution.best[film] = versions['1080'];
+        output['1080'][show] = versions['1080'];
+        output.best[show] = versions['1080'];
       }
 
       if (versions['2160']) {
-        filmsOnResolution['2160'][film] = versions['2160'];
-        filmsOnResolution.best[film] = versions['2160'];
+        output['2160'][show] = versions['2160'];
+        output.best[show] = versions['2160'];
       }
 
-      return filmsOnResolution;
+      return output;
     },
     {
       best: {},
       1080: {},
       2160: {},
-    } as FilmsPerResolution,
+    },
   );
 }
 
-export function getChildren(path: string, films: FilmsPerResolution) {
+interface GetChildrenParams {
+  path: string
+  films: FilmsPerResolution
+  shows: ShowsPerResolution
+}
+
+function formatEpisode(season: number | string, episode: number | string) {
+  return `S${season.toString().padStart(2, '0')}E${episode.toString().padStart(2, '0')}`;
+}
+
+export function getChildren({ path, films, shows }: GetChildrenParams) {
   if (matchRoot(path)) {
     return ['/best', '/2160', '/1080'].map(
       (folder) => createFolder({ path: folder }),
@@ -52,7 +84,7 @@ export function getChildren(path: string, films: FilmsPerResolution) {
   const resolutionFolderMatch = matchResolution(path);
   if (resolutionFolderMatch) {
     const { resolution } = resolutionFolderMatch;
-    return [`/${resolution}/films`].map(
+    return [`/${resolution}/films`, `/${resolution}/shows`].map(
       (folder) => createFolder({ path: folder }),
     );
   }
@@ -84,6 +116,50 @@ export function getChildren(path: string, films: FilmsPerResolution) {
         }),
       ];
     }
+  }
+
+  const showsMatch = matchShows(path);
+  if (showsMatch) {
+    const { resolution } = showsMatch;
+
+    return Object.keys(shows[resolution]).map(
+      (show) => createFolder({
+        path: `/${resolution}/shows/${show}`,
+      }),
+    );
+  }
+
+  const showFolderMatch = matchShowFolder(path);
+  if (showFolderMatch) {
+    const { resolution, show } = showFolderMatch;
+
+    if (!shows[resolution][show]) {
+      return undefined;
+    }
+
+    return Object.keys(shows[resolution][show]).map(
+      (season) => createFolder({
+        path: `/${resolution}/shows/${show}/season ${season}`,
+      }),
+    );
+  }
+
+  const seasonFolderMatch = matchSeasonFolder(path);
+  if (seasonFolderMatch) {
+    const { resolution, season, show } = seasonFolderMatch;
+    const seasonNumber = parseInt(season.replace(/\D+/g, ''), 10);
+
+    if (!shows[resolution][show] || !shows[resolution][show][seasonNumber]) {
+      return undefined;
+    }
+
+    return Object.entries(shows[resolution][show][seasonNumber]).map(
+      ([episode, file]) => createFile({
+        mimeType: file.mimeType,
+        path: `/${resolution}/shows/${show}/${season}/${show}-${formatEpisode(seasonNumber, episode)}${extensions[file.mimeType]}`,
+        size: file.size,
+      }),
+    );
   }
 
   return undefined;
@@ -123,34 +199,55 @@ interface Credentials {
 interface getStreamProps extends Credentials {
   path: string
   films: FilmsPerResolution
+  shows: ShowsPerResolution
   rangeHeader: string
 }
 
 export async function getVideoStream(props: getStreamProps) {
-  const { rangeHeader, path, films } = props;
+  const {
+    rangeHeader, path, films, shows,
+  } = props;
 
-  const match = matchFilmFile(path);
-  if (!match) {
+  let file: File;
+
+  const isFilm = matchFilmFile(path);
+  if (isFilm) {
+    const { film: title, resolution } = isFilm;
+
+    const film = films[resolution][title];
+    if (!film) {
+      return undefined;
+    }
+
+    file = film;
+  }
+
+  const isShow = isEpisodeFile(path);
+  if (isShow) {
+    const { episode, resolution, show } = isShow;
+    const { episode: ep, season } = getEpisodeDetails(episode);
+
+    if (!shows[resolution][show] || !shows[resolution][show][season]) {
+      return undefined;
+    }
+
+    file = shows[resolution][show][season][ep];
+  }
+
+  if (!file) {
     return undefined;
   }
 
-  const { film: title, resolution } = match;
-
-  const film = films[resolution][title];
-  if (!film) {
-    return undefined;
-  }
-
-  const range = parseRange(rangeHeader, film.size);
+  const range = parseRange(rangeHeader, file.size);
 
   const token = await getAccessToken(props.email, props.key);
-  const stream = await getStream(film.id, range.start, range.end, token);
+  const stream = await getStream(file.id, range.start, range.end, token);
 
   return {
     stream,
     headers: {
       'Accept-Ranges': 'bytes',
-      'Content-Type': film.mimeType,
+      'Content-Type': file.mimeType,
       'Content-Length': `${range.contentLength}`,
       'Content-Range': range.contentRange,
     },
@@ -161,15 +258,19 @@ interface RoutingParams {
   email: string
   key: string
   films: Films
+  shows: Shows
 }
 
 export class Routing {
   private films: FilmsPerResolution
 
+  private shows: ShowsPerResolution
+
   private credentials: Credentials
 
   constructor(params: RoutingParams) {
-    this.films = filmsPerResolution(params.films);
+    this.films = toResolution(params.films);
+    this.shows = toResolution(params.shows);
     this.credentials = {
       email: params.email,
       key: params.key,
@@ -177,14 +278,30 @@ export class Routing {
   }
 
   setFilms(films: Films) {
-    this.films = filmsPerResolution(films);
+    this.films = toResolution(films);
+  }
+
+  setShows(shows: Shows) {
+    this.shows = toResolution(shows);
   }
 
   async middleware(ctx: Context) {
-    const { path, method } = ctx;
+    const { method } = ctx;
+    const path = decodeURIComponent(ctx.path);
+
+    if (method === 'OPTIONS') {
+      ctx.status = 200;
+      ctx.set({
+        DAV: '1',
+        'Accept-Ranges': 'bytes',
+      });
+      return;
+    }
 
     if (method === 'PROPFIND') {
-      const children = getChildren(path, this.films);
+      const { films, shows } = this;
+      const children = getChildren({ path, films, shows });
+
       if (!children) {
         ctx.status = 404;
         return;
@@ -201,6 +318,7 @@ export class Routing {
         ...this.credentials,
         rangeHeader: ctx.get('range'),
         films: this.films,
+        shows: this.shows,
         path,
       });
 

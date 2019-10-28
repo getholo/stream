@@ -81,19 +81,16 @@ export const auth = (password: string, realm: string) => async (ctx: AuthContext
   const isDigest = header.startsWith('Digest');
   const isBasic = header.startsWith('Basic');
 
+  let username: string;
+
   if (isDigest) {
     try {
-      const username = digestAuth({
+      username = digestAuth({
         header,
         method,
         password,
         realm,
       });
-      if (username) {
-        ctx.state.user = username;
-        await next();
-        return;
-      }
     } catch {
       // Incorrect header given, resolve to 401
     }
@@ -101,21 +98,20 @@ export const auth = (password: string, realm: string) => async (ctx: AuthContext
 
   if (isBasic) {
     try {
-      const username = basicAuth({
+      username = basicAuth({
         header,
         password,
       });
-
-      if (username) {
-        ctx.state.user = username;
-        await next();
-        return;
-      }
     } catch {
       // Set Header down below
     }
   }
 
-  response.set('WWW-Authenticate', `Digest realm="${realm}", nonce="${nanoid(24)}", algorithm="MD5"`);
-  response.status = 401;
+  if (!username) {
+    response.set('WWW-Authenticate', `Digest realm="${realm}", nonce="${nanoid(24)}", algorithm="MD5"`);
+    response.status = 401;
+  }
+
+  ctx.state.user = username;
+  await next();
 };

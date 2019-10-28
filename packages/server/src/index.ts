@@ -26,11 +26,12 @@ export async function createServer(params: Params) {
     console.log(error);
   });
 
-  const { films } = content.createData();
+  const { films, shows } = content.createData();
   const routing = new Routing({
     email: params.email,
     key: params.key,
     films,
+    shows,
   });
   app.use((ctx) => routing.middleware(ctx));
 
@@ -40,6 +41,7 @@ export async function createServer(params: Params) {
       const newContent = content.createData();
 
       routing.setFilms(newContent.films);
+      routing.setShows(newContent.shows);
     },
     60 * 1000,
   );
