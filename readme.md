@@ -13,6 +13,9 @@
   <a href="https://github.com/airbnb/javascript">
     <img src="https://img.shields.io/badge/code%20style-airbnb-ff69b4" alt="Code Style">
   </a>
+  <a href="https://codecov.io/gh/getholo/stream">
+    <img src="https://img.shields.io/codecov/c/github/getholo/stream" alt="Coverage">
+  </a>
 </div>
 
 <div align="center">
