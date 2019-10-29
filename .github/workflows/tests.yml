@@ -12,3 +12,8 @@ jobs:
           node-version: '12.x'
       - run: yarn install
       - run: yarn test
+      - uses: codecov/codecov-action@v1.0.3
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: ./packages/server/coverage/clover.xml
+          flags: server
