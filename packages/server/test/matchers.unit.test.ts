@@ -5,6 +5,9 @@ import {
   matchShows,
   matchFilmFile,
   getEpisodeDetails,
+  matchShowFolder,
+  matchSeasonFolder,
+  isEpisodeFile,
 } from '../src/matchers';
 
 describe('Route Matchers', () => {
@@ -134,6 +137,68 @@ describe('Route Matchers', () => {
       expect(matchFilmFile('/best/films')).toBeFalsy();
       expect(matchFilmFile('/best/shows/show')).toBeFalsy();
       expect(matchFilmFile('/best/films/film/file')).toBeFalsy();
+    });
+  });
+
+  describe('Individual Show Folder Matcher', () => {
+    it('When given path "/best/shows/show", matcher should return resolution and title', () => {
+      const match = matchShowFolder('/best/shows/show');
+
+      expect(match).toBeTruthy();
+      expect(match.show).toEqual('show');
+      expect(match.resolution).toEqual('best');
+    });
+
+    it('When given any other path, matcher should return falsy', () => {
+      expect(matchShowFolder('/')).toBeFalsy();
+      expect(matchShowFolder('/2160')).toBeFalsy();
+      expect(matchShowFolder('/best/shows')).toBeFalsy();
+      expect(matchShowFolder('/best/shows/show/1')).toBeFalsy();
+    });
+  });
+
+  describe('Season Folder Matcher', () => {
+    it('When given path "/best/shows/show/season 100", matcher should return all details', () => {
+      const match = matchSeasonFolder('/best/shows/show/season 100');
+
+      expect(match).toBeTruthy();
+      expect(match.show).toEqual('show');
+      expect(match.resolution).toEqual('best');
+      expect(match.season).toEqual(100);
+      expect(match.prefix).toEqual('season ');
+    });
+
+    it('When given path "/best/shows/show/100", matcher should return all details', () => {
+      const match = matchSeasonFolder('/best/shows/show/100');
+
+      expect(match).toBeTruthy();
+      expect(match.show).toEqual('show');
+      expect(match.resolution).toEqual('best');
+      expect(match.season).toEqual(100);
+      expect(match.prefix).toEqual('');
+    });
+
+    it('When given any other path, matcher should return falsy', () => {
+      expect(matchSeasonFolder('/')).toBeFalsy();
+      expect(matchSeasonFolder('/best/shows/show/s100')).toBeFalsy();
+    });
+  });
+
+  describe('Episode File Matcher', () => {
+    it('When given path "/best/shows/show/season 100", matcher should return all details', () => {
+      const match = isEpisodeFile('/best/shows/show/season 10/episode.S10E01.2160p.mkv');
+
+      expect(match).toBeTruthy();
+      expect(match.show).toEqual('show');
+      expect(match.resolution).toEqual('best');
+      expect(match.season).toEqual(10);
+      expect(match.episode).toEqual(1);
+    });
+
+    it('When given any other path, matcher should return falsy', () => {
+      expect(isEpisodeFile('/')).toBeFalsy();
+      expect(isEpisodeFile('/best/shows/show/s100/S100E01.mkv')).toBeFalsy();
+      expect(isEpisodeFile('/best/shows/show/100/E01.mkv')).toBeFalsy();
     });
   });
 

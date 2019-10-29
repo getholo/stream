@@ -146,17 +146,18 @@ export function getChildren({ path, films, shows }: GetChildrenParams) {
 
   const seasonFolderMatch = matchSeasonFolder(path);
   if (seasonFolderMatch) {
-    const { resolution, season, show } = seasonFolderMatch;
-    const seasonNumber = parseInt(season.replace(/\D+/g, ''), 10);
+    const {
+      resolution, season, prefix, show,
+    } = seasonFolderMatch;
 
-    if (!shows[resolution][show] || !shows[resolution][show][seasonNumber]) {
+    if (!shows[resolution][show] || !shows[resolution][show][season]) {
       return undefined;
     }
 
-    return Object.entries(shows[resolution][show][seasonNumber]).map(
+    return Object.entries(shows[resolution][show][season]).map(
       ([episode, file]) => createFile({
         mimeType: file.mimeType,
-        path: `/${resolution}/shows/${show}/${season}/${show}-${formatEpisode(seasonNumber, episode)}${extensions[file.mimeType]}`,
+        path: `/${resolution}/shows/${show}/${prefix}${season}/${show}-${formatEpisode(season, episode)}${extensions[file.mimeType]}`,
         size: file.size,
       }),
     );
@@ -224,14 +225,15 @@ export async function getVideoStream(props: getStreamProps) {
 
   const isShow = isEpisodeFile(path);
   if (isShow) {
-    const { episode, resolution, show } = isShow;
-    const { episode: ep, season } = getEpisodeDetails(episode);
+    const {
+      episode, resolution, show, season,
+    } = isShow;
 
     if (!shows[resolution][show] || !shows[resolution][show][season]) {
       return undefined;
     }
 
-    file = shows[resolution][show][season][ep];
+    file = shows[resolution][show][season][episode];
   }
 
   if (!file) {
