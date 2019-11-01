@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.6](https://github.com/getholo/stream/compare/@getholo/stream@1.0.0-alpha.5...@getholo/stream@1.0.0-alpha.6) (2019-11-01)
+
+**Note:** Version bump only for package @getholo/stream
+
+
+
+
+
 # [1.0.0-alpha.5](https://github.com/getholo/stream/compare/@getholo/stream@1.0.0-alpha.4...@getholo/stream@1.0.0-alpha.5) (2019-11-01)
 
 

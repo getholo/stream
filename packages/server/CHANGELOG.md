@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.6](https://github.com/getholo/stream/compare/@getholo/stream-server@1.0.0-alpha.5...@getholo/stream-server@1.0.0-alpha.6) (2019-11-01)
+
+
+### Bug Fixes
+
+* authentication not working ([3ec345f](https://github.com/getholo/stream/commit/3ec345fa8d279a7d5f5b4eea264ae1fc34f1ffed))
+
+
+
+
+
 # [1.0.0-alpha.5](https://github.com/getholo/stream/compare/@getholo/stream-server@1.0.0-alpha.4...@getholo/stream-server@1.0.0-alpha.5) (2019-11-01)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@getholo/stream",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-alpha.6",
   "main": "link.js",
   "license": "MIT",
   "bin": {
@@ -14,7 +14,7 @@
     "@types/mri": "^1.1.0"
   },
   "dependencies": {
-    "@getholo/stream-server": "^1.0.0-alpha.5",
+    "@getholo/stream-server": "^1.0.0-alpha.6",
     "kleur": "^3.0.3",
     "mri": "^1.1.4"
   },
