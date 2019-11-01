@@ -18,7 +18,6 @@ import {
   matchSeasonFolder,
   matchShowFolder,
   isEpisodeFile,
-  getEpisodeDetails,
 } from './matchers';
 
 export type FilmsPerResolution = {
@@ -27,13 +26,15 @@ export type FilmsPerResolution = {
   }
 }
 
+export type ShowItems = {
+  [season: number]: {
+    [episode: number]: File
+  }
+}
+
 export type ShowsPerResolution = {
   [key in Resolution]: {
-    [show: string]: {
-      [season: number]: {
-        [episode: number]: File
-      }
-    }
+    [show: string]: ShowItems
   }
 }
 
@@ -70,7 +71,7 @@ interface GetChildrenParams {
   shows: ShowsPerResolution
 }
 
-function formatEpisode(season: number | string, episode: number | string) {
+export function formatEpisode(season: number | string, episode: number | string) {
   return `S${season.toString().padStart(2, '0')}E${episode.toString().padStart(2, '0')}`;
 }
 
@@ -166,7 +167,7 @@ export function getChildren({ path, films, shows }: GetChildrenParams) {
   return undefined;
 }
 
-const buffer = 50 * 1024 * 1024;
+export const buffer = 50 * 1024 * 1024;
 
 export function parseRange(range: string, size: number) {
   const [rangeStart, rangeEnd] = range
@@ -179,10 +180,16 @@ export function parseRange(range: string, size: number) {
   const startWithBuffer = requestedStart + buffer;
 
   const start = requestedStart;
-  const end = requestedEnd || startWithBuffer > size ? size : startWithBuffer;
+  let end: number;
+
+  if (requestedEnd) {
+    end = requestedEnd;
+  } else {
+    end = startWithBuffer > size ? size : startWithBuffer;
+  }
 
   const contentRange = `bytes ${start}-${end}/${size}`;
-  const contentLength = (requestedEnd || size) - requestedStart;
+  const contentLength = size - requestedStart;
 
   return {
     contentRange,
