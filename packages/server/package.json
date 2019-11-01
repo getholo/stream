@@ -1,6 +1,6 @@
 {
   "name": "@getholo/stream-server",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "Holo's Project Stream",
   "main": "dist/index.js",
   "scripts": {

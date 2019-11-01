@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.5](https://github.com/getholo/stream/compare/@getholo/stream-server@1.0.0-alpha.4...@getholo/stream-server@1.0.0-alpha.5) (2019-11-01)
+
+
+### Features
+
+* TV Shows support ([#10](https://github.com/getholo/stream/issues/10)) ([1a650cf](https://github.com/getholo/stream/commit/1a650cf48b802e5713f973908dfa5e30811a34b8))
+
+
+
+
+
 # [1.0.0-alpha.4](https://github.com/getholo/stream/compare/@getholo/stream-server@1.0.0-alpha.3...@getholo/stream-server@1.0.0-alpha.4) (2019-10-26)
 
 
