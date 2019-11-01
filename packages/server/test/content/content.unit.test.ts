@@ -6,6 +6,7 @@ import {
   Content,
   DriveFile,
   Films,
+  Shows,
 } from '../../src/content';
 
 jest.mock('axios');
@@ -92,6 +93,45 @@ describe('Content', () => {
           parents: ['2'],
           size: '1000',
         },
+        {
+          id: '5',
+          mimeType: 'application/vnd.google-apps.folder',
+          name: 'shows',
+          parents: ['root'],
+        },
+        {
+          id: '6',
+          mimeType: 'application/vnd.google-apps.folder',
+          name: 'show (year)',
+          parents: ['5'],
+        },
+        {
+          id: '7',
+          mimeType: 'application/vnd.google-apps.folder',
+          name: 'Season 1',
+          parents: ['6'],
+        },
+        {
+          id: '8',
+          mimeType: 'video/x-matroska',
+          name: 'show.year.S01E01.2160p.mkv',
+          parents: ['7'],
+          size: '1000',
+        },
+        {
+          id: '9',
+          mimeType: 'video/x-matroska',
+          name: 'show.year.S01E02.2160p.mkv',
+          parents: ['7'],
+          size: '1000',
+        },
+        {
+          id: '10',
+          mimeType: 'video/x-matroska',
+          name: 'show.year.S05E04.1080p.mkv',
+          parents: ['7'],
+          size: '1000',
+        },
       ];
 
       // files fetch
@@ -110,9 +150,9 @@ describe('Content', () => {
 
       await content.firstFetch();
 
-      const { films } = content.createData();
+      const { films, shows } = content.createData();
 
-      const expectedOutput: Films = {
+      const expectedFilms: Films = {
         'film-year': {
           1080: {
             id: '3',
@@ -127,7 +167,36 @@ describe('Content', () => {
         },
       };
 
-      expect(films).toEqual(expectedOutput);
+      const expectedShows: Shows = {
+        'show-year': {
+          2160: {
+            1: {
+              1: {
+                id: '8',
+                mimeType: 'video/x-matroska',
+                size: 1000,
+              },
+              2: {
+                id: '9',
+                mimeType: 'video/x-matroska',
+                size: 1000,
+              },
+            },
+          },
+          1080: {
+            5: {
+              4: {
+                id: '10',
+                mimeType: 'video/x-matroska',
+                size: 1000,
+              },
+            },
+          },
+        },
+      };
+
+      expect(films).toEqual(expectedFilms);
+      expect(shows).toEqual(expectedShows);
     });
   });
 

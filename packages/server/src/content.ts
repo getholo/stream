@@ -2,6 +2,7 @@ import axios from 'axios';
 import { getAccessToken } from './google';
 import { Files } from './data';
 import { generateFilmExp, generateShowExp } from './paths';
+import { getEpisodeDetails } from './matchers';
 
 export const extensions = {
   'video/quicktime': '.mov',
@@ -131,19 +132,32 @@ export async function fetchChanges(props: FetchChangesProps) {
   };
 }
 
-export interface FilmFile {
+export interface File {
   mimeType: keyof typeof extensions
   id: string
   size: number
 }
 
-export interface Versions {
-  '2160'?: FilmFile
-  '1080'?: FilmFile
+export interface Episode extends File {
+  season: number
+  episode: number
+}
+
+interface Versions<T> {
+  '2160'?: T
+  '1080'?: T
 }
 
 export interface Films {
-  [name: string]: Versions
+  [name: string]: Versions<File>
+}
+
+export interface Shows {
+  [show: string]: Versions<{
+    [season: number]: {
+      [episode: number]: File
+    }
+  }>
 }
 
 export interface DriveParams {
@@ -212,15 +226,17 @@ export class Content {
     for (const change of changes) {
       const { file } = change;
 
-      if (file.trashed) {
-        this.files.delete(file.id);
-      } else {
-        this.files.set(file.id, {
-          name: file.name,
-          parent: file.parents[0],
-          mimeType: file.mimeType,
-          size: parseInt(file.size, 10),
-        });
+      if (file) {
+        if (file.trashed) {
+          this.files.delete(file.id);
+        } else {
+          this.files.set(file.id, {
+            name: file.name,
+            parent: file.parents[0],
+            mimeType: file.mimeType,
+            size: parseInt(file.size, 10),
+          });
+        }
       }
     }
   }
@@ -231,13 +247,14 @@ export class Content {
     const { filmRegex, showRegex } = this.config;
 
     const films: Films = {};
+    const shows: Shows = {};
 
     const matchFilm = generateFilmExp(filmRegex);
     const matchShow = generateShowExp(showRegex);
 
     for (const [id, path] of paths) {
       const isFilm = matchFilm(path);
-      const isShow = matchShow(path); // <= future work
+      const isShow = matchShow(path);
 
       if (isFilm) {
         const { file, film } = isFilm;
@@ -258,10 +275,42 @@ export class Content {
           };
         }
       }
+
+      if (isShow) {
+        const { episode: file, show } = isShow;
+        const title = show.toLowerCase().replace(/ /g, '-').replace(/[^-\w]/g, '');
+
+        const matchResolution = file.match(/((1080)|(2160))p/);
+        const details = getEpisodeDetails(file);
+        const { mimeType, size } = this.files.get(id);
+
+        if (matchResolution && details && (mimeType === 'video/mp4' || mimeType === 'video/x-matroska')) {
+          const { episode, season } = details;
+          const resolution = matchResolution[1] as '2160' | '1080';
+          if (!shows[title]) {
+            shows[title] = {};
+          }
+
+          if (!shows[title][resolution]) {
+            shows[title][resolution] = {};
+          }
+
+          if (!shows[title][resolution][season]) {
+            shows[title][resolution][season] = {};
+          }
+
+          shows[title][resolution][season][episode] = {
+            id,
+            mimeType,
+            size,
+          };
+        }
+      }
     }
 
     return {
       films,
+      shows,
     };
   }
 }
