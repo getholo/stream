@@ -110,6 +110,7 @@ export const auth = (password: string, realm: string) => async (ctx: AuthContext
   if (!username) {
     response.set('WWW-Authenticate', `Digest realm="${realm}", nonce="${nanoid(24)}", algorithm="MD5"`);
     response.status = 401;
+    return;
   }
 
   ctx.state.user = username;
