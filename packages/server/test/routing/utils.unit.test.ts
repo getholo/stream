@@ -11,12 +11,14 @@ describe('Organise content on resolution', () => {
     id: '1',
     size: 1000,
     mimeType: 'video/mp4',
+    modifiedTime: Date.now(),
   };
 
   const two: File = {
     id: '2',
     size: 2000,
     mimeType: 'video/x-matroska',
+    modifiedTime: Date.now(),
   };
 
   it('Films with 2160p as best', () => {

@@ -15,18 +15,21 @@ const getToken = getAccessToken as jest.Mock;
 
 let callback: (req: IncomingMessage, res: ServerResponse) => void;
 
+const modifiedTime = new Date(1572698920777).toUTCString();
 const files: DriveFile[] = [
   {
     id: '1',
     name: 'films',
     mimeType: 'application/vnd.google-apps.folder',
     parents: ['VA'],
+    modifiedTime,
   },
   {
     id: '2',
     name: 'joker-2019',
     mimeType: 'application/vnd.google-apps.folder',
     parents: ['1'],
+    modifiedTime,
   },
   {
     id: '3',
@@ -34,6 +37,7 @@ const files: DriveFile[] = [
     mimeType: 'video/x-matroska',
     parents: ['2'],
     size: `${500 * 1024 * 1024}`,
+    modifiedTime,
   },
 ];
 

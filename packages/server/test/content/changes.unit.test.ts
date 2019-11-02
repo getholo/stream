@@ -14,6 +14,7 @@ const getToken = getAccessToken as jest.Mock;
 getToken.mockResolvedValue('token');
 
 let content: Content;
+const modifiedTime = new Date(1572698920777).toUTCString();
 
 beforeEach(async () => {
   content = new Content({
@@ -28,12 +29,14 @@ beforeEach(async () => {
       mimeType: 'application/vnd.google-apps.folder',
       name: 'films',
       parents: ['root'],
+      modifiedTime,
     },
     {
       id: '2',
       mimeType: 'application/vnd.google-apps.folder',
       name: 'film (year)',
       parents: ['1'],
+      modifiedTime,
     },
     {
       id: '3',
@@ -41,6 +44,7 @@ beforeEach(async () => {
       name: 'film.year.1080p.mkv',
       parents: ['2'],
       size: '1000',
+      modifiedTime,
     },
     {
       id: '4',
@@ -48,6 +52,7 @@ beforeEach(async () => {
       name: 'film.year.2160p.mkv',
       parents: ['2'],
       size: '1000',
+      modifiedTime,
     },
   ];
 
@@ -78,6 +83,7 @@ describe('Content: Changes', () => {
             file: {
               id: '5',
               mimeType: 'application/vnd.google-apps.folder',
+              modifiedTime,
               name: 'another film (year)',
               parents: ['1'],
             },
@@ -86,6 +92,7 @@ describe('Content: Changes', () => {
             file: {
               id: '6',
               mimeType: 'video/x-matroska',
+              modifiedTime,
               name: 'another.film.year.2160p.mkv',
               parents: ['5'],
               size: '1000',
@@ -102,11 +109,13 @@ describe('Content: Changes', () => {
         1080: {
           id: '3',
           mimeType: 'video/x-matroska',
+          modifiedTime: new Date(modifiedTime).getTime(),
           size: 1000,
         },
         2160: {
           id: '4',
           mimeType: 'video/x-matroska',
+          modifiedTime: new Date(modifiedTime).getTime(),
           size: 1000,
         },
       },
@@ -114,6 +123,7 @@ describe('Content: Changes', () => {
         2160: {
           id: '6',
           mimeType: 'video/x-matroska',
+          modifiedTime: new Date(modifiedTime).getTime(),
           size: 1000,
         },
       },
@@ -133,6 +143,7 @@ describe('Content: Changes', () => {
               parents: ['2'],
               size: '1000',
               trashed: true,
+              modifiedTime,
             },
           },
         ],
@@ -146,6 +157,7 @@ describe('Content: Changes', () => {
         1080: {
           id: '3',
           mimeType: 'video/x-matroska',
+          modifiedTime: new Date(modifiedTime).getTime(),
           size: 1000,
         },
       },

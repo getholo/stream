@@ -14,6 +14,7 @@ export interface DriveFile {
   id: string
   name: string
   mimeType: keyof typeof extensions | 'application/vnd.google-apps.folder'
+  modifiedTime: string
   md5Checksum?: string
   parents: string[]
   size?: string
@@ -46,7 +47,7 @@ export async function fetchFiles(props: FetchFilesProps) {
         pageSize: 1000,
         includeItemsFromAllDrives: true,
         supportsAllDrives: true,
-        fields: 'files/md5Checksum,files/id,files/mimeType,files/parents,files/name,files/size,nextPageToken',
+        fields: 'files/md5Checksum,files/id,files/mimeType,files/parents,files/name,files/size,files/modifiedTime,nextPageToken',
         q: "trashed = false and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'video/x-matroska' or mimeType = 'video/mp4')",
         pageToken,
       },
@@ -113,7 +114,7 @@ export async function fetchChanges(props: FetchChangesProps) {
         pageSize: 1000,
         includeItemsFromAllDrives: true,
         supportsAllDrives: true,
-        fields: 'changes/file/trashed,changes/file/md5Checksum,changes/file/id,changes/file/mimeType,changes/file/parents,changes/file/name,changes/file/size,changes/time,nextPageToken,newStartPageToken',
+        fields: 'changes/file/trashed,changes/file/md5Checksum,changes/file/id,changes/file/mimeType,changes/file/parents,changes/file/name,changes/file/size,changes/file/modifiedTime,changes/time,nextPageToken,newStartPageToken',
         pageToken,
       },
       headers: {
@@ -133,6 +134,7 @@ export async function fetchChanges(props: FetchChangesProps) {
 }
 
 export interface File {
+  modifiedTime: number
   mimeType: keyof typeof extensions
   id: string
   size: number
@@ -205,6 +207,7 @@ export class Content {
         name: file.name,
         parent: file.parents[0],
         mimeType: file.mimeType,
+        modifiedTime: new Date(file.modifiedTime).getTime(),
         size: parseInt(file.size, 10),
       });
     }
@@ -234,6 +237,7 @@ export class Content {
             name: file.name,
             parent: file.parents[0],
             mimeType: file.mimeType,
+            modifiedTime: new Date(file.modifiedTime).getTime(),
             size: parseInt(file.size, 10),
           });
         }
@@ -260,7 +264,7 @@ export class Content {
         const { file, film } = isFilm;
         const name = film.toLowerCase().replace(/ /g, '-').replace(/[^-\w]/g, '');
         const matchResolution = file.match(/((1080)|(2160))p/);
-        const { mimeType, size } = this.files.get(id);
+        const { mimeType, size, modifiedTime } = this.files.get(id);
 
         if (matchResolution && (mimeType === 'video/mp4' || mimeType === 'video/x-matroska')) {
           const resolution = matchResolution[1] as '2160' | '1080';
@@ -271,6 +275,7 @@ export class Content {
           films[name][resolution] = {
             id,
             mimeType,
+            modifiedTime,
             size,
           };
         }
@@ -282,7 +287,7 @@ export class Content {
 
         const matchResolution = file.match(/((1080)|(2160))p/);
         const details = getEpisodeDetails(file);
-        const { mimeType, size } = this.files.get(id);
+        const { mimeType, size, modifiedTime } = this.files.get(id);
 
         if (matchResolution && details && (mimeType === 'video/mp4' || mimeType === 'video/x-matroska')) {
           const { episode, season } = details;
@@ -302,6 +307,7 @@ export class Content {
           shows[title][resolution][season][episode] = {
             id,
             mimeType,
+            modifiedTime,
             size,
           };
         }

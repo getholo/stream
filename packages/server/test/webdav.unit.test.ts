@@ -6,11 +6,13 @@ describe('WebDAV Specification', () => {
     const path = `/best/films/${name}`;
     const size = 20 * 1024 * 1024;
     const mimeType = 'video/mp4';
+    const modifiedTime = 1572698920777;
 
     it('With a file as input, the correct XML Object should be generated', () => {
       const fileXML = createFile({
         path,
         mimeType,
+        modifiedTime,
         size,
       });
 
@@ -21,6 +23,7 @@ describe('WebDAV Specification', () => {
             displayname: name,
             getcontentlength: size,
             getcontenttype: mimeType,
+            getlastmodified: new Date(modifiedTime).toUTCString(),
           },
           status: 'HTTP/1.1 200 OK',
         },
@@ -31,6 +34,7 @@ describe('WebDAV Specification', () => {
       const fileXML = createFile({
         path,
         mimeType,
+        modifiedTime,
         size,
       });
 

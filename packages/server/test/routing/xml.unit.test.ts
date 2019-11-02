@@ -91,6 +91,7 @@ describe('Paths should return the right children', () => {
               const output = testGetChildren(`/${resolution}/shows/${show}/${season}`);
               expect(output).toEqual(Object.entries(episodes).map(
                 ([episode, file]) => createFile({
+                  modifiedTime: file.modifiedTime,
                   mimeType: file.mimeType,
                   size: file.size,
                   path: `/${resolution}/shows/${show}/${season}/${show}-${formatEpisode(season, episode)}${extensions[file.mimeType]}`,
