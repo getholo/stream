@@ -96,6 +96,7 @@ export function getChildren({ path, films, shows }: GetChildrenParams) {
 
     return Object.entries(films[resolution]).map(
       ([film, file]) => createFile({
+        modifiedTime: file.modifiedTime,
         mimeType: file.mimeType,
         path: `/${resolution}/films/${film}${extensions[file.mimeType]}`,
         size: file.size,
@@ -111,6 +112,7 @@ export function getChildren({ path, films, shows }: GetChildrenParams) {
     if (film) {
       return [
         createFile({
+          modifiedTime: film.modifiedTime,
           mimeType: film.mimeType,
           size: film.size,
           path,
@@ -157,6 +159,7 @@ export function getChildren({ path, films, shows }: GetChildrenParams) {
 
     return Object.entries(shows[resolution][show][season]).map(
       ([episode, file]) => createFile({
+        modifiedTime: file.modifiedTime,
         mimeType: file.mimeType,
         path: `/${resolution}/shows/${show}/${prefix}${season}/${show}-${formatEpisode(season, episode)}${extensions[file.mimeType]}`,
         size: file.size,

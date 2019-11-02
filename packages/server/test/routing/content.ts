@@ -11,18 +11,21 @@ const fileHDR: File = {
   id: '1',
   mimeType: 'video/x-matroska',
   size: 50 * 1024 * 1024 * 1024,
+  modifiedTime: Date.now(),
 };
 
 const fileHD: File = {
   id: '2',
   mimeType: 'video/mp4',
   size: 15 * 1024 * 1024 * 1024,
+  modifiedTime: Date.now(),
 };
 
 const file4K: File = {
   id: '3',
   mimeType: 'video/x-matroska',
   size: 25 * 1024 * 1024 * 1024,
+  modifiedTime: Date.now(),
 };
 
 export const films: FilmsPerResolution = {
@@ -53,6 +56,7 @@ const watchmen: ShowItems = {
       id: '102',
       mimeType: 'video/x-matroska',
       size: 50 * 1024 * 512,
+      modifiedTime: Date.now(),
     },
   },
 };

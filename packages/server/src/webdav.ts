@@ -42,16 +42,18 @@ interface CreateFileParams {
   path: string
   size: number
   mimeType: keyof typeof extensions
+  modifiedTime: number
 }
 
-export function createFile({ mimeType, path, size }: CreateFileParams): WebDavXML {
+export function createFile(file: CreateFileParams): WebDavXML {
   return {
-    href: path,
+    href: file.path,
     propstat: {
       prop: {
-        displayname: basename(path),
-        getcontentlength: size,
-        getcontenttype: mimeType,
+        displayname: basename(file.path),
+        getcontentlength: file.size,
+        getcontenttype: file.mimeType,
+        getlastmodified: new Date(file.modifiedTime).toUTCString(),
       },
       status: 'HTTP/1.1 200 OK',
     },

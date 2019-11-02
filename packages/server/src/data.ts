@@ -1,6 +1,7 @@
 export type MapFile = {
   name: string
   size?: number
+  modifiedTime?: number
   mimeType?: string
   parent: string
 }

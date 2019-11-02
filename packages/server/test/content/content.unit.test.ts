@@ -14,6 +14,7 @@ jest.mock('../../src/google');
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const getToken = getAccessToken as jest.Mock;
+const modifiedTime = new Date().toUTCString();
 
 getToken.mockReturnValue('token');
 
@@ -70,18 +71,21 @@ describe('Content', () => {
         {
           id: '1',
           mimeType: 'application/vnd.google-apps.folder',
+          modifiedTime,
           name: 'films',
           parents: ['root'],
         },
         {
           id: '2',
           mimeType: 'application/vnd.google-apps.folder',
+          modifiedTime,
           name: 'film (year)',
           parents: ['1'],
         },
         {
           id: '3',
           mimeType: 'video/x-matroska',
+          modifiedTime,
           name: 'film.year.1080p.mkv',
           parents: ['2'],
           size: '1000',
@@ -89,6 +93,7 @@ describe('Content', () => {
         {
           id: '4',
           mimeType: 'video/x-matroska',
+          modifiedTime,
           name: 'film.year.2160p.mkv',
           parents: ['2'],
           size: '1000',
@@ -96,24 +101,28 @@ describe('Content', () => {
         {
           id: '5',
           mimeType: 'application/vnd.google-apps.folder',
+          modifiedTime,
           name: 'shows',
           parents: ['root'],
         },
         {
           id: '6',
           mimeType: 'application/vnd.google-apps.folder',
+          modifiedTime,
           name: 'show (year)',
           parents: ['5'],
         },
         {
           id: '7',
           mimeType: 'application/vnd.google-apps.folder',
+          modifiedTime,
           name: 'Season 1',
           parents: ['6'],
         },
         {
           id: '8',
           mimeType: 'video/x-matroska',
+          modifiedTime,
           name: 'show.year.S01E01.2160p.mkv',
           parents: ['7'],
           size: '1000',
@@ -121,6 +130,7 @@ describe('Content', () => {
         {
           id: '9',
           mimeType: 'video/x-matroska',
+          modifiedTime,
           name: 'show.year.S01E02.2160p.mkv',
           parents: ['7'],
           size: '1000',
@@ -128,6 +138,7 @@ describe('Content', () => {
         {
           id: '10',
           mimeType: 'video/x-matroska',
+          modifiedTime,
           name: 'show.year.S05E04.1080p.mkv',
           parents: ['7'],
           size: '1000',
@@ -157,11 +168,13 @@ describe('Content', () => {
           1080: {
             id: '3',
             mimeType: 'video/x-matroska',
+            modifiedTime: new Date(modifiedTime).getTime(),
             size: 1000,
           },
           2160: {
             id: '4',
             mimeType: 'video/x-matroska',
+            modifiedTime: new Date(modifiedTime).getTime(),
             size: 1000,
           },
         },
@@ -174,11 +187,13 @@ describe('Content', () => {
               1: {
                 id: '8',
                 mimeType: 'video/x-matroska',
+                modifiedTime: new Date(modifiedTime).getTime(),
                 size: 1000,
               },
               2: {
                 id: '9',
                 mimeType: 'video/x-matroska',
+                modifiedTime: new Date(modifiedTime).getTime(),
                 size: 1000,
               },
             },
@@ -188,6 +203,7 @@ describe('Content', () => {
               4: {
                 id: '10',
                 mimeType: 'video/x-matroska',
+                modifiedTime: new Date(modifiedTime).getTime(),
                 size: 1000,
               },
             },
