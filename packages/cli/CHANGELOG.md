@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.8](https://github.com/getholo/stream/compare/@getholo/stream@1.0.0-alpha.6...@getholo/stream@1.0.0-alpha.8) (2019-11-12)
+
+
+### Bug Fixes
+
+* cli was missing bin ([3ea1c86](https://github.com/getholo/stream/commit/3ea1c86510793a8fda2fb310aecc457c08e1cbfa))
+
+
+
+
+
 # 1.0.0-alpha.7 (2019-11-12)
 
 
