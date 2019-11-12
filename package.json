@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "build": "lerna run build",
-    "watch": "lerna run watch",
+    "dev": "lerna run dev",
     "test": "lerna run test"
   },
   "devDependencies": {
@@ -15,12 +15,22 @@
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
     "eslint": "^6.5.1",
+    "eslint-config-airbnb": "^18.0.1",
     "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^2.2.0",
     "jest": "^24.9.0",
     "lerna": "^3.18.1",
+    "nock": "^11.7.0",
+    "rollup": "^1.26.3",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-typescript2": "^0.25.2",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "engines": {
     "node": ">= 12.0.0"

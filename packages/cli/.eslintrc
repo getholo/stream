@@ -1,7 +1,7 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": [
-    "airbnb-base"
+    "airbnb"
   ],
   "plugins": [
     "@typescript-eslint"
@@ -17,13 +17,18 @@
     "no-await-in-loop": "off",
     "camelcase": "off",
     "import/no-extraneous-dependencies": "off",
-    "no-loop-func": "warn",
+    "no-loop-func": "off",
     "import/prefer-default-export": "off",
     "no-undef": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".jsx", ".tsx"] }],
+    "react/prop-types": "off"
   },
   "settings": {
     "import/resolver": {
+      "typescript": {
+        "directory": "packages/cli/tsconfig.json"
+      },
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }

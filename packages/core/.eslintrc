@@ -1,7 +1,8 @@
 {
   "parser": "@typescript-eslint/parser",
   "extends": [
-    "airbnb-base"
+    "airbnb-base",
+    "plugin:import/typescript"
   ],
   "plugins": [
     "@typescript-eslint"
@@ -25,10 +26,7 @@
   "settings": {
     "import/resolver": {
       "typescript": {
-        "directory": "packages/server/tsconfig.json"
-      },
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "directory": "./packages/core/tsconfig.json"
       }
     }
   }
