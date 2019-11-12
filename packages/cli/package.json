@@ -1,9 +1,12 @@
 {
-  "name": "cli",
+  "name": "@getholo/stream",
   "version": "1.0.0-alpha.7",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
+  "bin": {
+    "stream": "link.js"
+  },
   "scripts": {
     "test": "jest",
     "build": "rollup -c",
