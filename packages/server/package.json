@@ -1,6 +1,6 @@
 {
   "name": "@getholo/stream-server",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "description": "Holo's Project Stream",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -11,7 +11,7 @@
     "dev": "rollup -c -w"
   },
   "dependencies": {
-    "@getholo/stream-core": "1.0.0-alpha.0",
+    "@getholo/stream-core": "^1.0.0-alpha.1",
     "find-my-way": "^2.2.1",
     "nanoid": "^2.1.6",
     "xml-js": "^1.6.11"

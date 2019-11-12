@@ -1,6 +1,6 @@
 {
   "name": "cli",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
@@ -10,7 +10,7 @@
     "dev": "rollup -c -w"
   },
   "dependencies": {
-    "@getholo/stream-server": "1.0.0-alpha.6",
+    "@getholo/stream-server": "^1.0.0-alpha.7",
     "mri": "^1.1.4"
   },
   "devDependencies": {
