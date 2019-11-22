@@ -38,10 +38,8 @@
 Project Stream is still considered to be in **alpha** stage. Many features are not yet implemented or might be unstable.
 Currently known limitations:
 
-- No support for TV Shows.
 - Only 1080p and 2160p content is currently supported.
 - No transcoded streams through the use of STRM.
-- No multi-user support.
 - No analytics platform.
 - Only supports shared drives.
 
@@ -74,7 +72,7 @@ Some of the most used patterns include:
 - `/Movies/:resolution/:film/:file`
 - `/Movies/:film/:file`
 
-The films pattern can be set by supplying the CLI with the `--filmsPattern <pattern>` flag.
+The films pattern can be set by supplying the CLI with the `--films <pattern>` flag.
 
 ### Setting up a new Shared Drive
 

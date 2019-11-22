@@ -1,22 +1,22 @@
 {
   "name": "@getholo/stream",
-  "version": "1.0.0-alpha.6",
-  "main": "link.js",
+  "version": "1.0.0-alpha.9",
   "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
   "bin": {
     "stream": "link.js"
   },
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch"
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
+  },
+  "dependencies": {
+    "@getholo/stream-server": "^1.0.0-alpha.8",
+    "mri": "^1.1.4"
   },
   "devDependencies": {
     "@types/mri": "^1.1.0"
   },
-  "dependencies": {
-    "@getholo/stream-server": "^1.0.0-alpha.6",
-    "kleur": "^3.0.3",
-    "mri": "^1.1.4"
-  },
-  "gitHead": "b7071db5cbcbf089b7d9643d3d84f71af7063332"
+  "gitHead": "321705827532f49081fe729879cd6889ee41af9b"
 }
