@@ -8,7 +8,6 @@
     "stream": "link.js"
   },
   "scripts": {
-    "test": "jest",
     "build": "rollup -c",
     "dev": "rollup -c -w"
   },
@@ -18,5 +17,6 @@
   },
   "devDependencies": {
     "@types/mri": "^1.1.0"
-  }
+  },
+  "gitHead": "321705827532f49081fe729879cd6889ee41af9b"
 }

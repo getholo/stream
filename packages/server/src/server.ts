@@ -9,7 +9,9 @@ import Users from './auth/users';
 import { listFilms } from '~/routes/films';
 import { streamEpisode, streamFilm } from '~/routes/streams';
 import { listMediaFolders, listResolutions } from '~/routes/base';
-import { listShows, listEpisodes, listSeasons } from '~/routes/shows';
+import {
+  listShows, listEpisodes, listSeasons, episodeDetails,
+} from '~/routes/shows';
 
 interface Props {
   credentials: {
@@ -79,6 +81,7 @@ export async function startServer(input: Props) {
     listShows(params);
     listSeasons(params);
     listEpisodes(params);
+    episodeDetails(params);
 
     listFilms(params);
 
@@ -88,7 +91,9 @@ export async function startServer(input: Props) {
 
   const server = http.createServer((req, res) => {
     console.log(req.method, req.url);
+    res.setHeader('DAV', '1');
     res.setHeader('Accept-Ranges', 'bytes');
+
     router.lookup(req, res);
   });
 

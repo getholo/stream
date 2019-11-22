@@ -12,5 +12,6 @@ module.exports = {
   },
   testPathIgnorePatterns: [
     'src/__tests__/helpers',
+    'dist',
   ],
 };

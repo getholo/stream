@@ -12,7 +12,7 @@ export function listResolutions({ router, users }: RouteParams) {
     (req, res) => withAuth(req, res, users, () => {
       const response = createMultipleFolders(['/best', '/1080', '/2160']);
 
-      res.writeHead(200, {
+      res.writeHead(207, {
         'Content-Type': 'text/xml',
       });
       res.end(response);
@@ -24,7 +24,7 @@ export function listMediaFolders({ router, resolution, users }: RouteParams) {
   router.propfind(
     `/${resolution}`,
     (req, res) => withAuth(req, res, users, () => {
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.writeHead(207, { 'Content-Type': 'text/xml' });
       res.end(createMultipleFolders([`/${resolution}/films`, `/${resolution}/shows`]));
     }),
   );

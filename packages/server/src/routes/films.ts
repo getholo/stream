@@ -28,7 +28,7 @@ export function listFilms(params: RouteParams) {
         [] as WebDavXML[],
       );
 
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.writeHead(207, { 'Content-Type': 'text/xml' });
       res.end(createXML(films));
     }),
   );

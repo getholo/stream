@@ -30,7 +30,7 @@ export function listShows(params: RouteParams) {
         [] as WebDavXML[],
       );
 
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.writeHead(207, { 'Content-Type': 'text/xml' });
       res.end(createXML(xml));
     }),
   );
@@ -56,12 +56,12 @@ export function listSeasons(params: RouteParams) {
       const xml = createXML(
         Object.keys(seasons).map(
           (season) => createFolder({
-            path: `/${resolution}/shows/${show}/season ${season}`,
+            path: `/${resolution}/shows/${show}/season%20${season}`,
           }),
         ),
       );
 
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.writeHead(207, { 'Content-Type': 'text/xml' });
       res.end(xml);
     }),
   );
@@ -80,7 +80,14 @@ export function listEpisodes(params: RouteParams) {
         return;
       }
 
-      const seasonNumber = parseInt(season.match(/\d+/)[0], 10);
+      const match = season.match(/\d+/);
+      if (!match) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+
+      const seasonNumber = parseInt(match[0], 10);
 
       const seasons = resolution === 'best'
         ? versions[2160] || versions[1080]
@@ -98,13 +105,62 @@ export function listEpisodes(params: RouteParams) {
           ([episode, file]) => createFile({
             mimeType: file.mimeType,
             modifiedTime: file.modifiedTime,
-            path: `${resolution}/shows/${show}/${season}/${show}-${format(seasonNumber, episode)}${extensions[file.mimeType]}`,
+            path: `/${resolution}/shows/${show}/${season}/${show}-${format(seasonNumber, episode)}${extensions[file.mimeType]}`,
             size: file.size,
           }),
         ),
       );
 
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.writeHead(207, { 'Content-Type': 'text/xml' });
+      res.end(xml);
+    }),
+  );
+}
+
+export function episodeDetails(params: RouteParams) {
+  const { drive, router, resolution } = params;
+
+  router.propfind(
+    `/${resolution}/shows/:show/:season/:episode`,
+    (req, res, { show, season, episode }) => withAuth(req, res, params.users, () => {
+      const versions = drive.shows[show];
+      if (!versions) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+
+      const seasonMatch = season.match(/\d+/);
+      const episodeMatch = episode.match(/\d+/);
+
+      if (!seasonMatch || !episodeMatch) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+
+      const seasonNumber = parseInt(seasonMatch[0], 10);
+      const episodeNumber = parseInt(episodeMatch[0], 10);
+
+      const seasons = resolution === 'best'
+        ? versions[2160] || versions[1080]
+        : versions[resolution];
+
+      const file = seasons?.[seasonNumber]?.[episodeNumber];
+      if (!file) {
+        res.statusCode = 404;
+        res.end();
+        return;
+      }
+
+      const xml = createXML([
+        createFile({
+          ...file,
+          path: `/${resolution}/shows/${show}/${season}/${episode}`,
+        }),
+      ]);
+
+      res.writeHead(207, { 'Content-Type': 'text/xml' });
       res.end(xml);
     }),
   );
